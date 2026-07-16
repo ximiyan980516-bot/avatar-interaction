@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>QQ秀互动Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-bottom-light: white;
+      --bg-middle-standard: #F5F6FA;
+      --bg-middle-light: #F2F3F5;
+      --text-primary: rgba(0, 0, 0, 0.90);
+      --text-primary-light: rgba(60, 60, 67, 0.76);
+      --text-secondary: rgba(60, 60, 67, 0.56);
+      --text-white-primary: rgba(255, 255, 255, 0.90);
+      --text-white-secondary: rgba(235, 235, 245, 0.56);
+      --fill-standard: rgba(255, 255, 255, 0.08);
+      --fill-light-primary: white;
+      --fill-light-secondary: white;
+      --fill-allblack-veryweak: rgba(102, 102, 102, 0.15);
+      --border-standard: rgba(0, 0, 0, 0.10);
+      --border-light: rgba(0, 0, 0, 0.05);
+      --brand-color: #0099FF;
+      --overlay-dark: rgba(0, 0, 0, 0.50);
+    }
+
+    body {
+      font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .phone-frame {
+      width: 428px;
+      height: 926px;
+      position: relative;
+      overflow: hidden;
+      background: var(--bg-bottom-light);
+    }
+
+    /* ======== "我"页面 - 抽屉底层 ======== */
+    .my-page {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      background: var(--bg-bottom-light);
+    }
+
+    /* 顶部模糊背景图 */
+    .my-page-bg {
+      width: 428px;
+      height: 428px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0.35;
+    }
+
+    .my-page-bg img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* 状态栏 */
+    .status-bar {
+      width: 428px;
+      height: 54px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      padding-top: 5px;
+    }
+
+    .status-bar .time {
+      position: absolute;
+      left: 56.77px;
+      top: 19.94px;
+      font-size: 17px;
+      font-weight: 590;
+      font-family: 'SF Pro', -apple-system, sans-serif;
+      color: #000;
+    }
+
+    .status-bar .status-icons {
+      position: absolute;
+      right: 0;
+      top: 5px;
+      width: 141px;
+      height: 44px;
+    }
+
+    .status-bar .status-icons img {
+      position: absolute;
+    }
+
+    /* 顶部操作栏（打卡、状态等） */
+    .top-actions {
+      position: absolute;
+      top: 54px;
+      left: 0;
+      width: 428px;
+      height: 44.05px;
+      z-index: 10;
+    }
+
+    .top-action-btn {
+      position: absolute;
+      height: 34px;
+      background: var(--fill-allblack-veryweak);
+      border-radius: 23.92px;
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      gap: 4px;
+    }
+
+    .top-action-btn span {
+      font-size: 14px;
+      font-weight: 500;
+      color: white;
+    }
+
+    .top-action-btn.small {
+      width: 34px;
+      padding: 0;
+      justify-content: center;
+    }
+
+    /* 用户信息卡片 */
+    .user-card {
+      position: absolute;
+      top: 114px;
+      left: 8px;
+      right: 8px;
+      width: auto;
+      height: 221px;
+      border-radius: 18px;
+      backdrop-filter: blur(25px);
+      overflow: hidden;
+      z-index: 5;
+    }
+
+    .user-card-bg {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .user-card-content {
+      position: absolute;
+      top: 18px;
+      left: 15px;
+      width: 264px;
+      height: 177px;
+    }
+
+    .user-name-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 28px;
+    }
+
+    .user-avatar-small {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+    }
+
+    .user-name {
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .switch-account {
+      height: 25px;
+      padding: 0 8px;
+      border-radius: 21.92px;
+      border: 0.5px solid var(--border-standard);
+      font-size: 12px;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+    }
+
+    .user-bio {
+      margin-top: 11px;
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+
+    .user-badges {
+      margin-top: 11px;
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .user-badges img {
+      width: 20px;
+      height: 20px;
+    }
+
+    .user-tags {
+      margin-top: 6px;
+      display: flex;
+      gap: 5px;
+    }
+
+    .user-tag {
+      height: 25px;
+      padding: 0 9px;
+      border-radius: 21.92px;
+      border: 0.5px solid var(--border-standard);
+      font-size: 12px;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .user-social {
+      margin-top: 26px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-social img {
+      width: 16px;
+      height: 16px;
+    }
+
+    .user-social span {
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+
+    /* 用户3D形象小图 */
+    .user-3d-avatar {
+      position: absolute;
+      top: 12px;
+      right: 15px;
+      width: 120px;
+      height: 120px;
+    }
+
+    /* 菜单列表 */
+    .menu-list {
+      position: absolute;
+      top: 341px;
+      left: 0;
+      width: 428px;
+    }
+
+    .menu-item {
+      width: 100%;
+      height: 54px;
+      background: var(--fill-light-primary);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      position: relative;
+      margin-top: 6px;
+    }
+
+    .menu-item:first-child {
+      margin-top: 0;
+    }
+
+    .menu-item .menu-icon {
+      width: 24px;
+      height: 24px;
+      margin-right: 16px;
+    }
+
+    .menu-item .menu-label {
+      font-size: 17px;
+      color: var(--text-primary);
+    }
+
+    .menu-item .menu-arrow {
+      position: absolute;
+      right: 16px;
+    }
+
+    .menu-item .menu-sub {
+      position: absolute;
+      right: 32px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .menu-divider {
+      width: 390px;
+      height: 0.5px;
+      margin-left: 20px;
+      background: var(--border-standard);
+      margin-top: 6px;
+    }
+
+    /* 底部工具栏（设置、夜间、深圳） */
+    .my-bottom-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 428px;
+      height: 103px;
+      background: white;
+      z-index: 5;
+    }
+
+    .my-bottom-tools {
+      display: flex;
+      gap: 32px;
+      padding: 7px 24px;
+    }
+
+    .my-bottom-tool {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .my-bottom-tool img {
+      width: 24px;
+      height: 24px;
+    }
+
+    .my-bottom-tool span {
+      font-size: 14px;
+      color: var(--text-primary);
+      opacity: 0.85;
+    }
+
+    /* ======== 遮罩层 ======== */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 428px;
+      height: 926px;
+      background: var(--overlay-dark);
+      z-index: 20;
+    }
+
+    /* ======== 半屏弹层 - QQ秀场 ======== */
+    .half-screen {
+      position: absolute;
+      top: 312px;
+      left: 0;
+      width: 428px;
+      height: 614px;
+      background: var(--bg-middle-standard);
+      border-top-left-radius: 24px;
+      border-top-right-radius: 24px;
+      box-shadow: 0px -3.5px 8.76px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      z-index: 30;
+    }
+
+    /* 半屏标题栏 */
+    .hs-header {
+      position: absolute;
+      top: 8px;
+      left: 0;
+      width: 428px;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .hs-header .hs-setting {
+      position: absolute;
+      left: 16px;
+      top: 8px;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+    }
+
+    .hs-header .hs-title {
+      position: absolute;
+      left: 166.5px;
+      top: 11px;
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    .hs-header .hs-actions {
+      position: absolute;
+      right: 16px;
+      top: 8px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .hs-header .hs-actions .hs-btn {
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    /* 收到赞 */
+    .hs-likes {
+      position: absolute;
+      top: 50px;
+      left: 163px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .hs-likes span {
+      font-size: 14px;
+      color: var(--text-primary-light);
+    }
+
+    /* QQ秀形象区域 - 蓝色雪花背景 */
+    .hs-avatar-area {
+      position: absolute;
+      top: 90px;
+      left: 23px;
+      width: 381px;
+      height: 400px;
+    }
+
+    .hs-avatar-area .snowflake-bg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 305px;
+      height: 288px;
+      z-index: 1;
+      object-fit: contain;
+    }
+
+    .hs-avatar-area .avatar-char {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%) scaleX(-1);
+      width: 384px;
+      height: 366px;
+      z-index: 2;
+      object-fit: contain;
+    }
+
+    .hs-avatar-area .avatar-shadow {
+      display: none;
+    }
+
+    /* 右侧功能按钮 */
+    .hs-side-buttons {
+      position: absolute;
+      top: 184px;
+      right: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+      z-index: 40;
+    }
+
+    .hs-side-group {
+      width: 44px;
+      background: var(--fill-light-secondary);
+      border-radius: 34px;
+      backdrop-filter: blur(40px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 0;
+      gap: 18px;
+    }
+
+    .hs-side-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .hs-side-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .hs-side-btn:active {
+      transform: scale(0.95);
+    }
+
+    .hs-side-btn img {
+      width: 20px;
+      height: 20px;
+    }
+
+    .hs-side-btn span {
+      font-size: 11px;
+      color: var(--text-primary);
+      text-align: center;
+    }
+
+    /* 底部操作栏 */
+    .hs-bottom-bar {
+      position: absolute;
+      bottom: 60px;
+      left: 78px;
+      width: 272px;
+      height: 66px;
+      background: var(--fill-light-secondary);
+      border-radius: 32px;
+      backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      z-index: 40;
+    }
+
+    .hs-bottom-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .hs-bottom-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .hs-bottom-btn img {
+      width: 24px;
+      height: 24px;
+    }
+
+    .hs-bottom-btn span {
+      font-size: 12px;
+      color: var(--text-primary);
+    }
+
+    /* ======== QQ秀好友列表页面 ======== */
+    .friends-page {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 428px;
+      height: 926px;
+      background: var(--bg-middle-light);
+      z-index: 50;
+      transform: translateX(100%);
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+
+    .friends-page.active {
+      transform: translateX(0);
+    }
+
+    /* 好友页导航 */
+    .friends-header {
+      width: 428px;
+      height: 88px;
+      position: relative;
+      background: var(--bg-middle-light);
+    }
+
+    .friends-status-bar {
+      width: 428px;
+      height: 44px;
+      position: relative;
+    }
+
+    .friends-status-bar .time {
+      position: absolute;
+      left: 56.77px;
+      top: 14.94px;
+      font-size: 17px;
+      font-weight: 590;
+      font-family: 'SF Pro', -apple-system, sans-serif;
+      color: #000;
+    }
+
+    .friends-status-bar .status-icons {
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 141px;
+      height: 44px;
+    }
+
+    .friends-nav {
+      width: 428px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+
+    .friends-nav .back-btn {
+      position: absolute;
+      left: 0;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .friends-nav .back-btn:active {
+      opacity: 0.5;
+    }
+
+    .friends-nav .nav-title {
+      position: absolute;
+      left: 175px;
+      top: 10px;
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    /* 好友卡片列表 */
+    .friends-list {
+      width: 428px;
+      height: calc(926px - 88px);
+      overflow-y: auto;
+      padding: 8px 16px 40px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .friends-list::-webkit-scrollbar {
+      display: none;
+    }
+
+    .friend-card {
+      width: 396px;
+      height: 317px;
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 14px;
+    }
+
+    .friend-card:nth-child(1) {
+      background: #C7E3A5;
+    }
+
+    .friend-card:nth-child(2) {
+      background: #EEFAFF;
+    }
+
+    .friend-card:nth-child(3) {
+      background: var(--bg-bottom-light);
+      border: 1px solid var(--border-light);
+    }
+
+    .friend-card:nth-child(4) {
+      background: var(--bg-bottom-light);
+      border: 1px solid var(--border-light);
+    }
+
+
+
+    .card-media {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .card-media img,
+    .card-media video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .card-header {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      z-index: 5;
+    }
+
+    .card-user {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+
+    .card-avatar img {
+      width: 100%;
+      height: 100%;
+    }
+
+    .card-user-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-username {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-white-primary);
+    }
+
+    .card-update-time {
+      font-size: 10px;
+      color: var(--text-white-secondary);
+    }
+
+    .card-actions-top {
+      display: flex;
+      gap: 8px;
+    }
+
+    .card-action-btn {
+      height: 30px;
+      padding: 0 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 21.92px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .card-action-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .card-action-btn:active {
+      transform: scale(0.95);
+    }
+
+    .card-action-btn .like-icon {
+      width: 14px;
+      height: 14px;
+    }
+
+    .card-action-btn span {
+      font-size: 12px;
+      color: var(--text-white-primary);
+    }
+
+    .card-footer {
+      position: absolute;
+      bottom: 14px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+      z-index: 5;
+    }
+
+    .card-tags {
+      display: none;
+    }
+
+    .card-tag {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.80);
+      font-weight: 500;
+    }
+
+    .card-tag.host {
+      color: var(--brand-color);
+      font-weight: 400;
+    }
+
+    .join-btn {
+      height: 36px;
+      padding: 0 12px 0 12px;
+      background: white;
+      border-radius: 31px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.08);
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .join-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0px 0px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .join-btn:active {
+      transform: scale(0.95);
+    }
+
+    .join-btn .join-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    .join-btn span {
+      font-size: 14px;
+      color: #000;
+      text-shadow: none;
+    }
+
+    /* 点赞动画（已禁用） */
+    .like-animation {
+      display: none;
+    }
+
+    /* Toast提示 */
+    .toast {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      background: rgba(0, 0, 0, 0.75);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 14px;
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 999;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+
+    /* 已点赞状态 */
+    .card-action-btn.liked {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* 已加入状态 */
+    .join-btn.joined {
+      background: rgba(0, 153, 255, 0.08);
+      border: 1px solid var(--brand-color);
+    }
+
+    .join-btn.joined span {
+      color: var(--brand-color);
+    }
+
+    /* 好友按钮红点 */
+    .hs-side-btn.has-dot::after {
+      content: '';
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      width: 8px;
+      height: 8px;
+      background: #FF3B30;
+      border-radius: 50%;
+    }
+
+    .hs-side-btn.has-dot {
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <!-- ======== "我"页面底层 ======== -->
+    <div class="my-page">
+      <!-- 顶部模糊背景 -->
+      <div class="my-page-bg">
+        <img src="assets/CodeBuddyAssets/5354_321488/51.png" alt="bg">
+      </div>
+
+      <!-- 状态栏 -->
+      <div class="status-bar">
+        <span class="time">9:00 </span>
+        <div class="status-icons" style="position:absolute;right:0;top:5px;width:141px;height:44px;">
+          <img src="assets/CodeBuddyAssets/5354_321488/1.svg" style="position:absolute;left:81px;top:18px;">
+          <img src="assets/CodeBuddyAssets/5354_321488/2.svg" style="position:absolute;left:56.7px;top:18.64px;">
+          <img src="assets/CodeBuddyAssets/5354_321488/3.svg" style="position:absolute;left:30px;top:18.54px;">
+        </div>
+      </div>
+
+      <!-- 顶部操作按钮 -->
+      <div class="top-actions">
+        <div class="top-action-btn" style="left:16px;top:5px;width:70px;">
+          <img src="assets/CodeBuddyAssets/5354_321488/4.svg" width="20" height="20">
+          <span>打卡</span>
+        </div>
+        <div class="top-action-btn" style="left:258px;top:5px;width:70px;">
+          <img src="assets/CodeBuddyAssets/5354_321488/5.svg" width="20" height="20">
+          <span>状态</span>
+        </div>
+        <div class="top-action-btn small" style="left:336px;top:5px;">
+          <img src="assets/CodeBuddyAssets/5354_321488/6.svg" width="20" height="20">
+        </div>
+        <div class="top-action-btn small" style="left:378px;top:5px;">
+          <img src="assets/CodeBuddyAssets/5354_321488/7.svg" width="20" height="20">
+        </div>
+      </div>
+
+      <!-- 用户信息卡片 -->
+      <div class="user-card">
+        <img class="user-card-bg" src="assets/CodeBuddyAssets/5354_321488/8.svg" alt="">
+        <div class="user-card-content">
+          <div class="user-name-row">
+            <img class="user-avatar-small" src="assets/CodeBuddyAssets/5354_321488/54.svg" style="width:28px;height:28px;">
+            <span class="user-name">沙拉酱</span>
+            <div class="switch-account">切换账号</div>
+          </div>
+          <div class="user-bio">信彩虹总跟着薄雾会带来幸福</div>
+          <div class="user-badges">
+            <img src="assets/CodeBuddyAssets/5354_321488/59.svg">
+            <img src="assets/CodeBuddyAssets/5354_321488/13.svg">
+            <img src="assets/CodeBuddyAssets/5354_321488/14.svg">
+            <img src="assets/CodeBuddyAssets/5354_321488/15.svg">
+            <img src="assets/CodeBuddyAssets/5354_321488/16.svg">
+          </div>
+          <div class="user-tags">
+            <div class="user-tag">NFT</div>
+            <div class="user-tag">游戏宅</div>
+            <div class="user-tag"><img src="assets/CodeBuddyAssets/5354_321488/57.svg" width="14" height="14">正能量</div>
+            <div class="user-tag">更多 <img src="assets/CodeBuddyAssets/5354_321488/17.svg" width="12" height="12"></div>
+          </div>
+          <div class="user-social">
+            <img src="assets/CodeBuddyAssets/5354_321488/18.svg">
+            <img src="assets/CodeBuddyAssets/5354_321488/19.svg">
+            <img src="assets/CodeBuddyAssets/5354_321488/20.svg" width="18" height="18">
+            <span>3条新互动</span>
+            <img src="assets/CodeBuddyAssets/5354_321488/21.svg" width="16" height="16">
+            <span>264</span>
+          </div>
+        </div>
+        <!-- 右侧3D小人 -->
+        <div class="user-3d-avatar">
+          <img src="assets/CodeBuddyAssets/5354_321488/53.png" style="width:120px;height:120px;object-fit:contain;">
+        </div>
+      </div>
+
+      <!-- 菜单列表 -->
+      <div class="menu-list">
+        <div class="menu-item">
+          <img class="menu-icon" src="assets/CodeBuddyAssets/5354_321488/22.svg">
+          <span class="menu-label">相册</span>
+          <img class="menu-arrow" src="assets/CodeBuddyAssets/5354_321488/23.svg" width="16" height="16">
+        </div>
+        <div class="menu-item">
+          <img class="menu-icon" src="assets/CodeBuddyAssets/5354_321488/24.svg">
+          <span class="menu-label">收藏</span>
+          <img class="menu-arrow" src="assets/CodeBuddyAssets/5354_321488/25.svg" width="16" height="16">
+        </div>
+        <div class="menu-item">
+          <img class="menu-icon" src="assets/CodeBuddyAssets/5354_321488/26.svg">
+          <span class="menu-label">文件</span>
+          <img class="menu-arrow" src="assets/CodeBuddyAssets/5354_321488/27.svg" width="16" height="16">
+        </div>
+        <div class="menu-item">
+          <img class="menu-icon" src="assets/CodeBuddyAssets/5354_321488/28.svg">
+          <span class="menu-label">钱包</span>
+          <img class="menu-arrow" src="assets/CodeBuddyAssets/5354_321488/29.svg" width="16" height="16">
+        </div>
+        <div class="menu-item">
+          <img class="menu-icon" src="assets/CodeBuddyAssets/5354_321488/30.svg">
+          <span class="menu-label">会员中心</span>
+          <img class="menu-arrow" src="assets/CodeBuddyAssets/5354_321488/31.svg" width="16" height="16">
+        </div>
+        <div class="menu-item">
+          <img class="menu-icon" src="assets/CodeBuddyAssets/5354_321488/32.svg">
+          <span class="menu-label">个性装扮</span>
+          <img class="menu-arrow" src="assets/CodeBuddyAssets/5354_321488/33.svg" width="16" height="16">
+        </div>
+        <div class="menu-divider"></div>
+        <div class="menu-item">
+          <img class="menu-icon" src="assets/CodeBuddyAssets/5354_321488/34.svg">
+          <span class="menu-label">免流量</span>
+          <span class="menu-sub">限时推广</span>
+          <img class="menu-arrow" src="assets/CodeBuddyAssets/5354_321488/35.svg" width="16" height="16">
+        </div>
+      </div>
+
+      <!-- 底部工具栏 -->
+      <div class="my-bottom-bar">
+        <div class="my-bottom-tools">
+          <div class="my-bottom-tool">
+            <img src="assets/CodeBuddyAssets/5354_321488/36.svg">
+            <span>设置</span>
+          </div>
+          <div class="my-bottom-tool">
+            <img src="assets/CodeBuddyAssets/5354_321488/37.svg">
+            <span>夜间</span>
+          </div>
+          <div class="my-bottom-tool">
+            <img src="assets/CodeBuddyAssets/5354_321488/38.svg">
+            <span>深圳</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== 遮罩层 ======== -->
+    <div class="overlay"></div>
+
+    <!-- ======== 半屏弹层 - 我的QQ秀场 ======== -->
+    <div class="half-screen">
+      <!-- 标题栏 -->
+      <div class="hs-header">
+        <div class="hs-setting">
+          <img src="assets/CodeBuddyAssets/5354_321488/42.svg" width="30" height="30" style="position:absolute;top:0;left:0;">
+          <img src="assets/CodeBuddyAssets/5354_321488/43.svg" width="18" height="18" style="position:absolute;top:6px;left:6px;">
+        </div>
+        <span class="hs-title">我的QQ秀场</span>
+        <div class="hs-actions">
+          <div class="hs-btn" style="position:relative;">
+            <img src="assets/CodeBuddyAssets/5354_321488/44.svg" width="30" height="30" style="position:absolute;top:0;left:0;">
+            <img src="assets/CodeBuddyAssets/5354_321488/45.svg" width="18" height="18" style="position:absolute;top:6px;left:6px;">
+          </div>
+          <div class="hs-btn" id="closeBtn" style="position:relative;">
+            <img src="assets/CodeBuddyAssets/5354_321488/46.svg" width="30" height="30" style="position:absolute;top:0;left:0;">
+            <img src="assets/CodeBuddyAssets/5354_321488/47.svg" width="16" height="16" style="position:absolute;top:7px;left:7px;">
+          </div>
+        </div>
+      </div>
+
+      <!-- 收到赞 -->
+      <div class="hs-likes">
+        <img src="assets/CodeBuddyAssets/5354_321488/41.svg" width="16" height="16">
+        <span>收到234个赞</span>
+      </div>
+
+      <!-- QQ秀形象区域 - 带蓝色雪花背景 -->
+      <div class="hs-avatar-area">
+        <!-- 蓝色雪花背景（底层） -->
+        <img class="snowflake-bg" src="assets/CodeBuddyAssets/5354_321488/55.png" alt="雪花背景">
+        <!-- 底部阴影 -->
+        <div class="avatar-shadow"></div>
+        <!-- 人物动图（apng，覆盖在雪花上方） -->
+        <img class="avatar-char" src="我-原神风格.png" alt="QQ秀形象">
+      </div>
+
+      <!-- 右侧功能按钮 -->
+      <div class="hs-side-buttons">
+        <div class="hs-side-group">
+          <div class="hs-side-btn" id="msgBtn">
+            <img src="assets/CodeBuddyAssets/5354_321488/39.svg">
+            <span>消息</span>
+          </div>
+          <div class="hs-side-btn has-dot" id="friendsBtn">
+            <img src="assets/CodeBuddyAssets/5354_321488/40.svg">
+            <span>好友</span>
+          </div>
+        </div>
+        <div class="hs-side-group">
+          <div class="hs-side-btn" id="showcaseBtn">
+            <img src="assets/CodeBuddyAssets/5354_321488/58.svg" width="24" height="24">
+            <span>展柜</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部操作栏 -->
+      <div class="hs-bottom-bar">
+        <div class="hs-bottom-btn">
+          <img src="assets/CodeBuddyAssets/5354_321488/48.svg">
+          <span>形象</span>
+        </div>
+        <div class="hs-bottom-btn">
+          <img src="assets/CodeBuddyAssets/5354_321488/49.svg">
+          <span>动作</span>
+        </div>
+        <div class="hs-bottom-btn">
+          <img src="assets/CodeBuddyAssets/5354_321488/50.svg">
+          <span>背景</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== QQ秀好友列表页面 ======== -->
+    <div class="friends-page" id="friendsPage">
+      <!-- 状态栏 -->
+      <div class="friends-header">
+        <div class="friends-status-bar">
+          <span class="time" style="position:absolute;left:56.77px;top:14.94px;font-size:17px;font-weight:590;font-family:'SF Pro',sans-serif;color:#000;">9:00 </span>
+          <div class="status-icons" style="position:absolute;right:0;top:0;width:141px;height:44px;">
+            <img src="assets/CodeBuddyAssets/5354_321488/1.svg" style="position:absolute;left:81px;top:18px;">
+            <img src="assets/CodeBuddyAssets/5354_321488/2.svg" style="position:absolute;left:56.7px;top:18.64px;">
+            <img src="assets/CodeBuddyAssets/5354_321488/3.svg" style="position:absolute;left:30px;top:18.54px;">
+          </div>
+        </div>
+        <div class="friends-nav">
+          <div class="back-btn" id="backBtn">
+            <img src="assets/CodeBuddyAssets/5359_44372/4.svg" width="24" height="24">
+          </div>
+          <span class="nav-title">QQ秀好友</span>
+        </div>
+      </div>
+
+      <!-- 好友卡片列表 -->
+      <div class="friends-list" id="friendsList">
+        <!-- 卡片1 - 蹦迪 -->
+        <div class="friend-card" data-index="0">
+          <div class="card-media">
+            <video autoplay loop muted playsinline>
+              <source src="蹦迪.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="card-header">
+            <div class="card-user">
+              <div class="card-avatar">
+                <img src="assets/CodeBuddyAssets/5359_44372/66.svg" alt="">
+              </div>
+              <div class="card-user-info">
+                <span class="card-username">高能泡泡</span>
+                <span class="card-update-time">2小时前更新</span>
+              </div>
+            </div>
+            <div class="card-actions-top">
+              <div class="card-action-btn like-btn" data-index="0">
+                <svg class="like-icon" viewBox="0 0 14 14" fill="none"><path d="M7 12.25C7 12.25 1.75 9.625 1.75 5.6875C1.75 4.25 2.9375 3.0625 4.375 3.0625C5.425 3.0625 6.3375 3.6375 7 4.5C7.6625 3.6375 8.575 3.0625 9.625 3.0625C11.0625 3.0625 12.25 4.25 12.25 5.6875C12.25 9.625 7 12.25 7 12.25Z" fill="none" stroke="white" stroke-width="1.2"/></svg>
+                <span>42</span>
+              </div>
+              <div class="card-action-btn">
+                <span>展柜</span>
+                <span>8</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <div class="card-tags">
+              <span class="card-tag host">房主</span>
+              <span class="card-tag">咕噜杏仁</span>
+              <span class="card-tag">高能泡泡</span>
+              <span class="card-tag">COCO</span>
+            </div>
+            <div class="join-btn" data-index="0">
+              <img class="join-icon" src="assets/CodeBuddyAssets/5359_44372/6.svg">
+              <span>一起蹦迪</span>
+            </div>
+          </div>
+          <div class="like-animation">❤️</div>
+        </div>
+
+        <!-- 卡片2 - 乐队 -->
+        <div class="friend-card" data-index="1">
+          <div class="card-media">
+            <video autoplay loop muted playsinline>
+              <source src="乐队.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="card-header">
+            <div class="card-user">
+              <div class="card-avatar">
+                <img src="assets/CodeBuddyAssets/5359_44372/67.svg" alt="">
+              </div>
+              <div class="card-user-info">
+                <span class="card-username">咕噜杏仁</span>
+                <span class="card-update-time">3小时前更新</span>
+              </div>
+            </div>
+            <div class="card-actions-top">
+              <div class="card-action-btn like-btn" data-index="1">
+                <svg class="like-icon" viewBox="0 0 14 14" fill="none"><path d="M7 12.25C7 12.25 1.75 9.625 1.75 5.6875C1.75 4.25 2.9375 3.0625 4.375 3.0625C5.425 3.0625 6.3375 3.6375 7 4.5C7.6625 3.6375 8.575 3.0625 9.625 3.0625C11.0625 3.0625 12.25 4.25 12.25 5.6875C12.25 9.625 7 12.25 7 12.25Z" fill="none" stroke="white" stroke-width="1.2"/></svg>
+                <span>7</span>
+              </div>
+              <div class="card-action-btn">
+                <span>展柜</span>
+                <span>15</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <div class="card-tags">
+              <span class="card-tag host">房主</span>
+              <span class="card-tag">咕噜杏仁</span>
+              <span class="card-tag">高能泡泡</span>
+              <span class="card-tag">COCO</span>
+            </div>
+            <div class="join-btn" data-index="1">
+              <img class="join-icon" src="assets/CodeBuddyAssets/5359_44372/7.svg">
+              <span>一起乐队</span>
+            </div>
+          </div>
+          <div class="like-animation">❤️</div>
+        </div>
+
+        <!-- 卡片3 - 修仙 -->
+        <div class="friend-card" data-index="2">
+          <div class="card-media">
+            <video autoplay loop muted playsinline>
+              <source src="魔法修仙.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="card-header">
+            <div class="card-user">
+              <div class="card-avatar">
+                <img src="assets/CodeBuddyAssets/5359_44372/68.svg" alt="">
+              </div>
+              <div class="card-user-info">
+                <span class="card-username">COCO</span>
+                <span class="card-update-time">5小时前更新</span>
+              </div>
+            </div>
+            <div class="card-actions-top">
+              <div class="card-action-btn like-btn" data-index="2">
+                <svg class="like-icon" viewBox="0 0 14 14" fill="none"><path d="M7 12.25C7 12.25 1.75 9.625 1.75 5.6875C1.75 4.25 2.9375 3.0625 4.375 3.0625C5.425 3.0625 6.3375 3.6375 7 4.5C7.6625 3.6375 8.575 3.0625 9.625 3.0625C11.0625 3.0625 12.25 4.25 12.25 5.6875C12.25 9.625 7 12.25 7 12.25Z" fill="none" stroke="white" stroke-width="1.2"/></svg>
+                <span>156</span>
+              </div>
+              <div class="card-action-btn">
+                <span>展柜</span>
+                <span>5</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <div class="card-tags">
+              <span class="card-tag host">房主</span>
+              <span class="card-tag">咕噜杏仁</span>
+              <span class="card-tag">高能泡泡</span>
+              <span class="card-tag">COCO</span>
+            </div>
+            <div class="join-btn" data-index="2">
+              <img class="join-icon" src="assets/CodeBuddyAssets/5359_44372/7.svg">
+              <span>一起修仙</span>
+            </div>
+          </div>
+          <div class="like-animation">❤️</div>
+        </div>
+
+        <!-- 卡片4 - 钓鱼 -->
+        <div class="friend-card" data-index="3">
+          <div class="card-media">
+            <video autoplay loop muted playsinline>
+              <source src="钓鱼.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="card-header">
+            <div class="card-user">
+              <div class="card-avatar">
+                <img src="assets/CodeBuddyAssets/5359_44372/69.svg" alt="">
+              </div>
+              <div class="card-user-info">
+                <span class="card-username">星辰大海</span>
+                <span class="card-update-time">昨天更新</span>
+              </div>
+            </div>
+            <div class="card-actions-top">
+              <div class="card-action-btn like-btn" data-index="3">
+                <svg class="like-icon" viewBox="0 0 14 14" fill="none"><path d="M7 12.25C7 12.25 1.75 9.625 1.75 5.6875C1.75 4.25 2.9375 3.0625 4.375 3.0625C5.425 3.0625 6.3375 3.6375 7 4.5C7.6625 3.6375 8.575 3.0625 9.625 3.0625C11.0625 3.0625 12.25 4.25 12.25 5.6875C12.25 9.625 7 12.25 7 12.25Z" fill="none" stroke="white" stroke-width="1.2"/></svg>
+                <span>23</span>
+              </div>
+              <div class="card-action-btn">
+                <span>展柜</span>
+                <span>10</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <div class="card-tags">
+              <span class="card-tag host">房主</span>
+              <span class="card-tag">咕噜杏仁</span>
+              <span class="card-tag">高能泡泡</span>
+            </div>
+            <div class="join-btn" data-index="3">
+              <img class="join-icon" src="assets/CodeBuddyAssets/5359_44372/7.svg">
+              <span>一起钓鱼</span>
+            </div>
+          </div>
+          <div class="like-animation">❤️</div>
+        </div>
+
+
+      </div>
+    </div>
+
+    <!-- Toast提示 -->
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <script>
+    const friendsPage = document.getElementById('friendsPage');
+    const friendsBtn = document.getElementById('friendsBtn');
+    const backBtn = document.getElementById('backBtn');
+    const toast = document.getElementById('toast');
+
+    // 点击「好友」按钮进入好友页面
+    friendsBtn.addEventListener('click', () => {
+      friendsPage.classList.add('active');
+    });
+
+    // 返回按钮
+    backBtn.addEventListener('click', () => {
+      friendsPage.classList.remove('active');
+    });
+
+    // 点赞功能
+    const likeBtns = document.querySelectorAll('.like-btn');
+    likeBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const index = btn.getAttribute('data-index');
+        const card = document.querySelector(`.friend-card[data-index="${index}"]`);
+        const likeAnim = card.querySelector('.like-animation');
+        const countSpan = btn.querySelectorAll('span')[0];
+
+        if (btn.classList.contains('liked')) {
+          btn.classList.remove('liked');
+          const svgPath = btn.querySelector('svg path');
+          svgPath.setAttribute('fill', 'none');
+          svgPath.setAttribute('stroke', 'white');
+          countSpan.textContent = parseInt(countSpan.textContent) - 1;
+        } else {
+          btn.classList.add('liked');
+          const svgPath = btn.querySelector('svg path');
+          svgPath.setAttribute('fill', '#FF3B30');
+          svgPath.setAttribute('stroke', '#FF3B30');
+          countSpan.textContent = parseInt(countSpan.textContent) + 1;
+
+          likeAnim.classList.add('show');
+          setTimeout(() => {
+            likeAnim.classList.remove('show');
+            likeAnim.classList.add('hide');
+            setTimeout(() => {
+              likeAnim.classList.remove('hide');
+            }, 400);
+          }, 600);
+        }
+      });
+    });
+
+    // 加入功能
+    const joinBtns = document.querySelectorAll('.join-btn');
+    joinBtns.forEach(btn => {
+      const originalText = btn.querySelector('span').textContent;
+      const originalIcon = btn.querySelector('.join-icon').src;
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const textSpan = btn.querySelector('span');
+        const iconImg = btn.querySelector('.join-icon');
+
+        if (btn.classList.contains('joined')) {
+          btn.classList.remove('joined');
+          textSpan.textContent = originalText;
+          iconImg.src = originalIcon;
+          showToast('已离开');
+        } else {
+          btn.classList.add('joined');
+          textSpan.textContent = '离开';
+          iconImg.src = 'assets/CodeBuddyAssets/5375_44796/1.svg';
+          showToast(`已加入「${originalText}」`);
+        }
+      });
+    });
+
+    // 双击点赞
+    let lastTap = 0;
+    const friendCards = document.querySelectorAll('.friend-card');
+    friendCards.forEach(card => {
+      card.addEventListener('click', (e) => {
+        const currentTime = new Date().getTime();
+        const tapLength = currentTime - lastTap;
+        if (tapLength < 300 && tapLength > 0) {
+          const likeBtn = card.querySelector('.like-btn');
+          if (!likeBtn.classList.contains('liked')) {
+            likeBtn.click();
+          } else {
+            const likeAnim = card.querySelector('.like-animation');
+            likeAnim.classList.add('show');
+            setTimeout(() => {
+              likeAnim.classList.remove('show');
+              likeAnim.classList.add('hide');
+              setTimeout(() => {
+                likeAnim.classList.remove('hide');
+              }, 400);
+            }, 600);
+          }
+          e.preventDefault();
+        }
+        lastTap = currentTime;
+      });
+    });
+
+    function showToast(text) {
+      toast.textContent = text;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 1500);
+    }
+
+    // 视频替换函数 - 后续提供视频后调用
+    function replaceWithVideo(cardIndex, videoSrc) {
+      const card = document.querySelector(`.friend-card[data-index="${cardIndex}"]`);
+      if (card) {
+        const mediaContainer = card.querySelector('.card-media');
+        mediaContainer.innerHTML = `
+          <video autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;">
+            <source src="${videoSrc}" type="video/mp4">
+          </video>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>
